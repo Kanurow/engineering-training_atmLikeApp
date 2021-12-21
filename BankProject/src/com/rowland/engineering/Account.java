@@ -1,19 +1,21 @@
 package com.rowland.engineering;
 
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.util.*;
+
 
 public class Account {
-    public String accountName;
-    public int accountBalance = 0;
-    public ArrayList<Integer> transactionHistory;
-    public ArrayList<String> accountInfo;
-    public String defaultAccount = "81234";
+    String accountName;
+    private int accountBalance = 0;
+    ArrayList<Integer> transactionHistory;
+    ArrayList<String> accountInfo;
+    private String defaultAccount = "081234";
     public String defaultPassword = "1234";
-    
-    
+
+
     Scanner scanner = new Scanner(System.in);
+    Calendar date = new GregorianCalendar();
+    LocalDate calendar = LocalDate.of(date.get(Calendar.YEAR),date.get(Calendar.MONTH) + 1,date.get(Calendar.DAY_OF_MONTH));
 
     public Account(String accountName) {
         this.accountName = accountName;
@@ -27,7 +29,7 @@ public class Account {
         System.out.println("Enter password");
         String inputPassword = scanner.next();
         if (defaultAccount.equals(inputAccountNumber) && defaultPassword.equals(inputPassword)) {
-            System.out.println("Login Successful");
+            System.out.println("Login Successful \nWelcome " + accountName);
             startBankActivities();
         } else {
             System.out.println("Invalid Account Details");
@@ -35,10 +37,15 @@ public class Account {
     }
 
 
-
     public void startBankActivities() {
         System.out.println("How can we help you today?");
-        System.out.println("1) Make Deposit \n2) Make Withdrawal \n3) View Account Balance \n4) Exit To Main Menu");
+        System.out.println("""
+                1) Make Deposit\s
+                2) Make Withdrawal\s
+                3) View Account Balance\s
+                4) Fixed Deposit\s
+                5) View Transaction History\s
+                6)Exit To Main Menu""");
         int customerResponse = scanner.nextInt();
         if (customerResponse == 1) {
             System.out.println("How much do you want to deposit?");
@@ -49,13 +56,22 @@ public class Account {
             int withdrawalAmount = scanner.nextInt();
             withdrawal(withdrawalAmount);
         } else if ( customerResponse == 3) {
-            System.out.println("Your total money balance is ");
             getAccountBalance();
+            performAnotherTransaction();
         } else if( customerResponse == 4) {
+            fixedDeposit();
+        } else if (customerResponse == 5) {
+            viewTransactionHistory();
+            performAnotherTransaction();
+        } else if (customerResponse == 6){
             createAccount();
         } else {
             System.out.println("Invalid Option Selected");
         }
+    }
+
+    public void viewTransactionHistory() {
+        System.out.println("Your account transaction history is "+ transactionHistory);
     }
 
     public void createAccount() {
@@ -63,15 +79,12 @@ public class Account {
         System.out.println("Do you have an account with us? \n Enter 1 if yes \n Enter 2 if no");
         int response = scanner.nextInt();
         if (response == 1) {
-            // Login and perform some operations
             login();
-
         } else if (response == 2) {
-            // register then login
             registerAccount();
-
         } else {
             System.out.println("Invalid Input");
+
         }
     }
 
@@ -88,8 +101,9 @@ public class Account {
     }
 
 
-    public int getAccountBalance() {
-        return accountBalance;
+    public void getAccountBalance() {
+        System.out.println("Your account balance is  " + accountBalance);
+        performAnotherTransaction();
     }
 
     public void deposit(int amount) {
@@ -103,7 +117,79 @@ public class Account {
         }
     }
 
-    
+    public void fixedDeposit() {
+        System.out.println("Enter Duration Of Your Fixed Deposit And Amount To Fix " +
+                "\nHow Many Months Do You Wish To Fix");
+        int fixedDuration = scanner.nextInt();
+        System.out.println("Enter Your Fixed Deposit Amount");
+        System.out.println("""
+                1) At 5% - 7% annually ($500 - $5000)\s
+                2) At 8% - 12% annually ($5001 and above)
+                 Enter Amount You Wish To Fix""");
+        int fixedAmount = scanner.nextInt();
+        if (this.accountBalance < fixedAmount) {
+            System.out.println("Insufficient fund to fix");
+            performAnotherTransaction();
+        } else {
+            if (fixedAmount >= 500 && fixedAmount <= 5000) {
+                if (fixedAmount <= 1000) {
+                    System.out.println("You will earn at the rate of 5% annually");
+                    double profitEarned = (fixedAmount * .05);
+                    double profitEarnedPlusCapital = profitEarned + fixedAmount;
+                    System.out.println("Fixed Date (yy/mm/dd) :: "+ date.get(Calendar.YEAR)+ " " + (date.get(Calendar.MONTH) + 1) + " "
+                            + date.get(Calendar.DAY_OF_MONTH));
+                    System.out.println("Maturity Date (yy/mm/dd) :: ");
+                    System.out.println(calendar.plusMonths(fixedDuration));
+                    System.out.println("Your capital will earn interest of $"+profitEarned+ " and total amount payable" +
+                            " after maturity is $" + profitEarnedPlusCapital);
+                    this.accountBalance -= fixedAmount;
+                    this.transactionHistory.add(-fixedAmount);
+                    performAnotherTransaction();
+                } else if (fixedAmount  <= 3000) {
+                    System.out.println("You will earn at the rate of 6% annually");
+                    double profitEarned = (fixedAmount * .06);
+                    double profitEarnedPlusCapital = profitEarned + fixedAmount;
+                    System.out.println("Fixed Date (yy/mm/dd) :: "+ date.get(Calendar.YEAR)+ " " + (date.get(Calendar.MONTH) + 1) + " "
+                            + date.get(Calendar.DAY_OF_MONTH));
+                    System.out.println("Maturity Date (yy/mm/dd) :: ");
+                    System.out.println(calendar.plusMonths(fixedDuration));
+                    System.out.println(" Your capital will earn interest of $"+profitEarned+ " and total amount payable" +
+                            " after maturity is $" + profitEarnedPlusCapital);
+                    this.accountBalance -= fixedAmount;
+                    this.transactionHistory.add(-fixedAmount);
+                    performAnotherTransaction();
+                } else if (fixedAmount <= 5000) {
+                    System.out.println("You will earn at the rate of 7% annually");
+                    double profitEarned = (fixedAmount * .07);
+                    double profitEarnedPlusCapital = profitEarned + fixedAmount;
+                    System.out.println("Fixed Date (yy/mm/dd) :: "+ date.get(Calendar.YEAR)+ " " + (date.get(Calendar.MONTH) + 1) + " "
+                            + date.get(Calendar.DAY_OF_MONTH));
+                    System.out.println("Maturity Date (yy/mm/dd) :: " + calendar.plusMonths(fixedDuration));
+                    System.out.println("Your capital will earn interest of $"+profitEarned+ " and total amount payable" +
+                            " after maturity is $" + profitEarnedPlusCapital);
+                    this.accountBalance -= fixedAmount;
+                    this.transactionHistory.add(-fixedAmount);
+                    performAnotherTransaction();
+                }
+            } else if (fixedAmount > 5000) {
+                System.out.println("You will earn at the rate of 9% annually");
+                double profitEarned = (fixedAmount * .09);
+                double profitEarnedPlusCapital = profitEarned + fixedAmount;
+                System.out.println("Fixed Date (yy/mm/dd) :: "+ date.get(Calendar.YEAR)+ " " + (date.get(Calendar.MONTH) + 1) + " "
+                        + date.get(Calendar.DAY_OF_MONTH));
+                System.out.println("Maturity Date (yy/mm/dd) :: ");
+                System.out.println(calendar.plusMonths(fixedDuration));
+                System.out.println(" Your capital will earn interest of $"+profitEarned+ " and total amount payable" +
+                        " after maturity is $" + profitEarnedPlusCapital);
+                this.accountBalance -= fixedAmount;
+                this.transactionHistory.add(-fixedAmount);
+                performAnotherTransaction();
+            }
+        }
+
+
+    }
+
 
     public void registerAccount() {
         System.out.println("<=========REGISTRATION=======>");
@@ -126,7 +212,7 @@ public class Account {
         System.out.println("Confirm Password");
         String confirmPassword = scanner.next();
         accountInfo.add(confirmPassword);
-        
+
         if (accountInfo.get(3).equals(accountInfo.get(4)) ) {
             System.out.println("Registration Successful");
             generateAccountNumber();
@@ -148,18 +234,16 @@ public class Account {
         int randomAccountNumber = random.nextInt(999999999);
         String customerAccountNumber = Integer.toString(randomAccountNumber);
         accountInfo.add(customerAccountNumber);
-        System.out.println("Your Row Bank Account Number is " + customerAccountNumber + ". Please " +
-                "keep it safe for log in");
+        System.out.println("Your Row Bank Account Number is " + customerAccountNumber + ".\n Please " +
+                "keep it safe for log in. \n You can now deposit into your account");
     }
 
     public void withdrawal(int amount) {
         int withdrawal = -amount;
-
         if (amount > this.accountBalance) {
             System.out.println("Insufficient Fund");
             return;
         }
-
         if (withdrawal < 0) {
             this.transactionHistory.add(withdrawal);
             this.accountBalance += withdrawal;
